@@ -1,5 +1,3 @@
-# Author -> Edgar Chacín
-
 import tkinter as tk
 import threading
 from tkinter import filedialog
@@ -98,7 +96,7 @@ def download_video(yt, selected_resolution, directory, lbl):
     os.remove(join_path(".temp", "video"))
     os.remove(join_path(".temp", "audio"))
     os.rename(f"{directory}/video.mp4", video_path)
-    lbl.config(text = path)
+    lbl.config(text = video_path)
     showinfo(title="¡Descarga completada!", message=f"El vídeo {video.title} se ha descargado correctamente en la ruta {video_path}")
   else:
     showerror(title="Error", message="No se encontró el vídeo específicado.")

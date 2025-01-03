@@ -1,5 +1,3 @@
-# Author -> Edgar Chacín
-
 import tkinter as tk
 from tkinter.messagebox import showerror
 import utils
