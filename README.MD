@@ -55,6 +55,17 @@ git clone https://github.com/edgarchacinweb/Python-youtube-downloader.git
     python -m venv .venv
     ```
 
+4) Accede al entorno virtual
+    - **Linux y MacOS:**
+    ```
+    . .venv/bin/activate
+    ```
+
+    - **Windows:**
+    ```
+    . .venv/Scripts/activate
+    ```
+
 4) Instala las dependencias
 
 ```
