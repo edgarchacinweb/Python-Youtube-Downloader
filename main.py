@@ -7,7 +7,7 @@ import os
 from PIL import Image, ImageTk
 
 # Global variables
-program_version = "1.1.0"
+program_version = "1.1.7"
 w = 430
 h = 450
 thumbnail_width = 225
@@ -76,7 +76,7 @@ def create_video_controls(vid_details):
   download_btn.grid(column=3, row=8, sticky=tk.EW, padx=5)
   
   # Status text
-  status_lbl = ttk.Label(master=frame, text="Vídeo encontrado", compound=tk.LEFT, font="Helvetica 12 bold")
+  status_lbl = ttk.Label(master=frame, text="Vídeo encontrado", compound=tk.LEFT, font="Helvetica 10 bold")
   status_lbl.grid(column=0, row=10, sticky=tk.EW, columnspan=4, pady=(5, 0), padx=(2, 2))
 
   # Progress Bar
