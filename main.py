@@ -7,7 +7,7 @@ import os
 from PIL import Image, ImageTk
 
 # Global variables
-program_version = "1.1.7"
+program_version = "1.2.0"
 w = 430
 h = 450
 thumbnail_width = 225
