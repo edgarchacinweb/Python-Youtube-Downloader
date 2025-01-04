@@ -107,11 +107,13 @@ def download_video(yt, selected_resolution, directory, lbl):
     showerror(title="Error", message="No se encontró el vídeo específicado.")
 
 def download_audio(yt, directory, lbl):
-  if os.path.exists(os.path.join(directory, f"{audio.title}.mp3")):
-    showerror(title="Error", message=f"El audio \"{audio.title}.mp3\" ya existe")
-    return
   try:
     audio = yt.streams.get_audio_only()
+
+    if os.path.exists(os.path.join(directory, f"{audio.title}.mp3")):
+      showerror(title="Error", message=f"El audio \"{audio.title}.mp3\" ya existe")
+      return
+
     audio.download(output_path=directory, filename=f"{audio.title}.mp3")
     audio_path = f"{directory}/{audio.title}.mp3"
     lbl.config(text="Audio descargado")
