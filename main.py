@@ -77,15 +77,24 @@ def create_video_controls(vid_details):
   
   # Status text
   status_lbl = ttk.Label(master=frame, text="Vídeo encontrado", compound=tk.LEFT, font="Helvetica 10 bold")
-  status_lbl.grid(column=0, row=10, sticky=tk.EW, columnspan=4, pady=(5, 0), padx=(2, 2))
+  status_lbl.grid(column=0, row=10, sticky=tk.W, columnspan=2, pady=(5, 0), padx=(2, 2))
+  progress_lbl = ttk.Label(master=frame, text="", compound=tk.RIGHT, font="Helvetica 10 bold")
+  progress_lbl.grid(column=2, row=10, sticky=tk.E, columnspan=2, pady=(5, 0), padx=(2, 2))
 
   # Progress Bar
   bar = ttk.Progressbar(master=frame, orient="horizontal", mode="determinate", length=100)
   bar.grid(column=0, row=11, sticky=tk.EW, columnspan=4, padx=(2, 2), pady=(0, 5))
 
   # Bindings
+  widgets = {
+    "res_combo": res_combo,
+    "progress_bar": bar,
+    "status_lbl": status_lbl,
+    "progress_lbl": progress_lbl
+  }
+
   res_combo.bind("<<ComboboxSelected>>", lambda event, btn=download_btn: commands.select_resolution(event, btn))
-  download_btn.bind("<Button>", lambda event, res_combo=res_combo, progress=bar, url=vid_details["url"], status=status_lbl: commands.download(event, res_combo, progress, url, status))
+  download_btn.bind("<Button>", lambda event, url=vid_details["url"], wg=widgets: commands.download(event, url, wg))
 
 
 if __name__ == "__main__":

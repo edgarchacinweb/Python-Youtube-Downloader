@@ -7,7 +7,7 @@ import os
 import re
 from utils import join_path, remove_dir, bytes_to_mb
 
-def on_progress(stream, chunk, bytes_remaining, progress_bar, status_lbl):
+def on_progress(stream, chunk, bytes_remaining, progress_bar, status_lbl, progress_lbl):
   total_size = stream.filesize
   bytes_downloaded = total_size - bytes_remaining
   percentage = bytes_downloaded / total_size * 100
@@ -19,7 +19,8 @@ def on_progress(stream, chunk, bytes_remaining, progress_bar, status_lbl):
   
   mb_downloaded = round(bytes_to_mb(bytes_downloaded), 2)
   total_mb = round(bytes_to_mb(total_size), 2)
-  status_lbl.config(text = f"{text} [{int(rounded)}%]... {mb_downloaded} MB / {total_mb} MB")
+  status_lbl.config(text = f"{text} [{int(rounded)}%]...")
+  progress_lbl.config(text= f"{mb_downloaded} MB | {total_mb} MB")
 
 def on_complete(stream, filepath, btn, lbl):
   btn["state"] = tk.NORMAL
@@ -53,8 +54,8 @@ def find_video(url, cb):
 def select_resolution(event, btn):
   btn["state"]=tk.NORMAL
 
-def download(event, res, progress, url, status_lbl):
-  selected_resolution = res.get()
+def download(event, url, widgets):
+  selected_resolution = widgets["res_combo"].get()
   directory = filedialog.askdirectory()
   if directory:
     try:
@@ -62,22 +63,22 @@ def download(event, res, progress, url, status_lbl):
       btn["state"] = tk.DISABLED
       yt = YouTube(
         url,
-        on_progress_callback=lambda stream=None, chunk=None, bytes=None, bar=progress: on_progress(stream, chunk, bytes, bar, status_lbl),
-        on_complete_callback=lambda stream=None, filepath=None, button=btn, lbl=status_lbl: on_complete(stream, filepath, button, lbl)
+        on_progress_callback=lambda stream=None, chunk=None, bytes=None: on_progress(stream, chunk, bytes, widgets["progress_bar"], widgets["status_lbl"], widgets["progress_lbl"]),
+        on_complete_callback=lambda stream=None, filepath=None, button=btn, lbl=widgets["status_lbl"]: on_complete(stream, filepath, button, lbl)
       )
-      if selected_resolution == res["values"][-1]:
-        status_lbl.config(text = "Descargando audio [0%]...")
+      if selected_resolution == widgets["res_combo"]["values"][-1]:
+        widgets["status_lbl"].config(text = "Descargando audio [0%]...")
         showinfo(title="Descarga iniciada", message="Descargando audio, por favor espere...")
-        thread = threading.Thread(target=download_audio, args=(yt, directory, status_lbl))
+        thread = threading.Thread(target=download_audio, args=(yt, directory, widgets["status_lbl"], widgets["progress_lbl"]))
       else:
         showinfo(title="Descargando", message="Descargando vídeo, por favor espere...\nNo cierre el programa hasta que se complete la descarga.")
-        thread = threading.Thread(target=download_video, args=(yt, selected_resolution, directory, status_lbl))
+        thread = threading.Thread(target=download_video, args=(yt, selected_resolution, directory, widgets["status_lbl"], widgets["progress_lbl"]))
       thread.start()
     except Exception as e:
       showerror(title="Error", message="Ocurrió un error desconocido al intentar descargar el vídeo.")
       print(type(e), "->", e)
     
-def download_video(yt, selected_resolution, directory, lbl):
+def download_video(yt, selected_resolution, directory, lbl, progress_lbl):
   video = yt.streams.filter(file_extension="mp4", resolution=selected_resolution).first()
   audio = yt.streams.get_audio_only()
   if video:
@@ -85,6 +86,7 @@ def download_video(yt, selected_resolution, directory, lbl):
       showerror(title="Error", message=f"El vídeo \"{video.title}.mp4\" ya existe")
       return
   
+    progress_lbl.config(text = f"0.00 MB | {round(bytes_to_mb(video.filesize), 2)} MB")
     if not os.path.isdir(join_path(".temp")):
       os.mkdir(join_path(".temp"))
     lbl.config(text = "Descargando vídeo [0%]...")
@@ -106,7 +108,7 @@ def download_video(yt, selected_resolution, directory, lbl):
   else:
     showerror(title="Error", message="No se encontró el vídeo específicado.")
 
-def download_audio(yt, directory, lbl):
+def download_audio(yt, directory, lbl, progress_lbl):
   try:
     audio = yt.streams.get_audio_only()
 
@@ -114,6 +116,7 @@ def download_audio(yt, directory, lbl):
       showerror(title="Error", message=f"El audio \"{audio.title}.mp3\" ya existe")
       return
 
+    progress_lbl.config(text = f"0.00 MB | {round(bytes_to_mb(audio.filesize), 2)} MB")
     audio.download(output_path=directory, filename=f"{audio.title}.mp3")
     audio_path = f"{directory}/{audio.title}.mp3"
     lbl.config(text="Audio descargado")
